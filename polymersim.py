@@ -1,7 +1,7 @@
-#import numpy as np
-import pylab as pl
 import enum
 import random
+import csv
+import argparse
 
 class Direction(enum.Enum):
     NORTH = enum.auto()
@@ -33,21 +33,26 @@ def update_position(position_list, step):
     position_list.append(new_position)
     return position_list
 
+def polymer_sim():
+    NUMBER_POINTS = 100000
+    START = [0,0]
+    positions = [START]
+    for number in range(NUMBER_POINTS):
+        random_number = random.random()
+        direction = direction_from_rand(random_number)
+        step = step_from_direction(direction)
+        positions = update_position(positions, step)
+    return positions
 
-NUMBER_POINTS = 1000
-START = [0,0]
+def main():
+    parser = argparse.ArgumentParser(description='Run polymersimulation')
+    parser.add_argument('output_file', metavar='output_file', type=str, help='Output File')
+    args = parser.parse_args()
 
-positions = [START]
-x = [START[0]]
-y = [START[1]]
+    polymer_positions = polymer_sim()
+    with open(args.output_file, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(polymer_positions)
 
-for number in range(NUMBER_POINTS):
-    random_number = random.random()
-    direction = direction_from_rand(random_number)
-    step = step_from_direction(direction)
-    positions = update_position(positions, step)
-    x.append(positions[-1][0])
-    y.append(positions[-1][1])
-
-pl.plot(x,y,'o-')
-pl.show()
+if __name__ == "__main__":
+    main()
